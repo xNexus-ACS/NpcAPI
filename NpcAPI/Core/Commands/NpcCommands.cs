@@ -52,7 +52,7 @@ namespace NpcAPI.Core.Commands
             
             if (arguments.Count < 4)
             {
-                response = "Usage: npc spawn <name> <badge> <badgeColor> <roleType>";
+                response = "Usage: npc spawn <name> <badge> <badgeColor> <id> <roleType>";
                 return false;
             }
             
@@ -61,7 +61,7 @@ namespace NpcAPI.Core.Commands
             var badgeColor = arguments.At(2);
             var id = int.Parse(arguments.At(3));
 
-            Npc npc = new Npc(name, badge, badgeColor, player.Position, player.Rotation, id);
+            Npc npc = new Npc(name, badge, badgeColor, player.Position, player.Rotation, id, RoleTypeId.ClassD);
             npc.Spawn();
             
             response = "Spawned NPC";

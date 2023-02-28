@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Exiled.API.Features;
-using MEC;
 using Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
@@ -35,7 +34,7 @@ namespace NpcAPI.Core
 
             NetworkServer.AddPlayerForConnection(FakeConnection, _npc);
             
-            // Setting the Instance Mode to Host to allow the NPC to join the server
+            // Setting the Instance Mode and ID to Unverified to allow the NPC to join the server
             try
             {
                 hub.characterClassManager.UserId = $"npc{id}@server";
@@ -43,20 +42,15 @@ namespace NpcAPI.Core
             catch
             {
             }
-            hub.characterClassManager.InstanceMode = ClientInstanceMode.Host;
+            hub.characterClassManager.InstanceMode = ClientInstanceMode.Unverified;
             
             // Setting the NPCs name, badge, badge color, role, position and rotation
-            try
-            {
-                hub.nicknameSync.SetNick(name);
-                hub.serverRoles.SetText(badge);
-                hub.serverRoles.SetColor(badgeColor);
-            }
-            catch
-            {
-            }
+            hub.nicknameSync.SetNick(name);
+            
+            hub.serverRoles.SetText(badge);
+            hub.serverRoles.SetColor(badgeColor);
 
-            Timing.CallDelayed(0.1f, () => hub.roleManager.ServerSetRole(roleType, RoleChangeReason.RemoteAdmin));
+            hub.roleManager.ServerSetRole(roleType, RoleChangeReason.RemoteAdmin);
             
             hub.TryOverridePosition(position, rotation);
             
@@ -85,5 +79,16 @@ namespace NpcAPI.Core
         public void HideFromPlayer(Player player) => Player.NetworkIdentity.HideForPlayer(player);
 
         public void ShowPlayer(Player player) => Player.NetworkIdentity.ShowForPlayer(player);
+        
+        // create a Get method to get the NPC from the ID without creating a new NPC
+        public static Npc Get(int id)
+        {
+            if (ConnectionsIds.TryGetValue(id, out ReferenceHub hub))
+            {
+                return ConnectionsIds.ContainsKey(id) ? new Npc() : null;
+            }
+
+            return null;
+        }
     }
 }
