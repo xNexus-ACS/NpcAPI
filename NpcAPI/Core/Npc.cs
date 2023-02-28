@@ -24,17 +24,14 @@ namespace NpcAPI.Core
 
         public Npc(string name, string badge, string badgeColor, Vector3 position, Vector3 rotation, int id, RoleTypeId roleType = RoleTypeId.CustomRole)
         {
-            // Instantiating the player prefab and getting the ReferenceHub for the NPC
             _npc = Object.Instantiate(NetworkManager.singleton.playerPrefab);
 
             var hub = _npc.GetComponent<ReferenceHub>();
             
-            // Creating the Fake Connection
             FakeConnection = new FakeConnection(id);
 
             NetworkServer.AddPlayerForConnection(FakeConnection, _npc);
             
-            // Setting the Instance Mode and ID to Unverified to allow the NPC to join the server
             try
             {
                 hub.characterClassManager.UserId = $"npc{id}@server";
@@ -44,7 +41,6 @@ namespace NpcAPI.Core
             }
             hub.characterClassManager.InstanceMode = ClientInstanceMode.Unverified;
             
-            // Setting the NPCs name, badge, badge color, role, position and rotation
             hub.nicknameSync.SetNick(name);
             
             hub.serverRoles.SetText(badge);
@@ -80,7 +76,6 @@ namespace NpcAPI.Core
 
         public void ShowPlayer(Player player) => Player.NetworkIdentity.ShowForPlayer(player);
         
-        // create a Get method to get the NPC from the ID without creating a new NPC
         public static Npc Get(int id)
         {
             if (ConnectionsIds.TryGetValue(id, out ReferenceHub hub))
