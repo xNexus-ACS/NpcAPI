@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
+using Mirror;
 using PlayerRoles;
 
 namespace NpcAPI.Core.Commands
@@ -45,7 +47,7 @@ namespace NpcAPI.Core.Commands
                 response = "You don't have permission to use this command";
                 return false;
             }
-            
+
             Player player = Player.Get(sender);
             
             if (arguments.Count < 4)
@@ -57,9 +59,9 @@ namespace NpcAPI.Core.Commands
             var name = arguments.At(0);
             var badge = arguments.At(1);
             var badgeColor = arguments.At(2);
-            var roleType = (RoleTypeId) Enum.Parse(typeof(RoleTypeId), arguments.At(3));
+            var id = int.Parse(arguments.At(3));
 
-            Npc npc = new Npc(name, badge, badgeColor, roleType, player.Position, player.Rotation);
+            Npc npc = new Npc(name, badge, badgeColor, player.Position, player.Rotation, id);
             npc.Spawn();
             
             response = "Spawned NPC";
@@ -87,12 +89,14 @@ namespace NpcAPI.Core.Commands
                 return false;
             }
 
-            var name = arguments.At(0);
-            Npc npc = Npc.Get(name);
-            
-            npc.Destroy();
-
-            response = "Npc UnSpawned";
+            int id = int.Parse(arguments.At(0));
+            if (Npc.ConnectionsIds.TryGetValue(id, out ReferenceHub hub))
+            {
+                Npc.Connections.Remove(Npc.Connections.FirstOrDefault(s => s.Value == hub).Key);
+                Npc.ConnectionsIds.Remove(id);
+                NetworkServer.Destroy(hub.gameObject);
+            }
+            response = "Destroyed";
             return true;
         }
     }
