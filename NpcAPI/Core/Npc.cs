@@ -41,7 +41,7 @@ namespace NpcAPI.Core
             }
             hub.characterClassManager.InstanceMode = ClientInstanceMode.Unverified;
             
-            hub.nicknameSync.SetNick(name);
+            hub.nicknameSync.Network_myNickSync = name;
             
             hub.serverRoles.SetText(badge);
             hub.serverRoles.SetColor(badgeColor);
